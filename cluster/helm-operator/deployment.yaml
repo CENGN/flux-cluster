@@ -9,16 +9,20 @@ spec:
   selector:
     matchLabels:
       name: helm-operator
+      app: flux-helm
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         name: helm-operator
+        app: flux-helm
       annotations:
         prometheus.io/scrape: "true"
     spec:
       serviceAccountName: helm-operator
+      nodeSelector:
+        workerClass: infra
       volumes:
       #
       # You will need these two volumes if you want to establish validated TLS
