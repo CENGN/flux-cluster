@@ -9,7 +9,7 @@ spec:
   chart:
     repository: https://charts.bitnami.com/bitnami
     name: redis
-    version: 9.5.2 #chart version refers to appVersion: 5.0.5
+    version: 9.1.7 #chart version refers to tag: 5.0.5-debian-9s-r124
   values:
     image:
       registry: docker.io
