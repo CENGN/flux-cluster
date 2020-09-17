@@ -158,7 +158,7 @@ spec:
       statefulset:
         updateStrategy: RollingUpdate
     metrics:
-      enabled: false
+      enabled: true
       image:
         registry: docker.io
         repository: bitnami/redis-exporter
