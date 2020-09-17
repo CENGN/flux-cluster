@@ -9,12 +9,12 @@ spec:
   chart:
     repository: https://charts.bitnami.com/bitnami
     name: redis
-    version: 9.1.7 #chart version refers to tag: 5.0.5-debian-9s-r124
+    version: 9.5.2
   values:
     image:
       registry: docker.io
       repository: bitnami/redis
-      tag: 5.0.5-debian-9-r124
+      tag: 5.0.5-debian-9-r181
       pullPolicy: IfNotPresent
     cluster:
       enabled: true
@@ -24,7 +24,7 @@ spec:
       image:
         registry: docker.io
         repository: bitnami/redis-sentinel
-        tag: 5.0.5-debian-9-r119
+        tag: 5.0.5-debian-9-r174
         pullPolicy: IfNotPresent
       masterSet: mymaster
       initialCheckTimeout: 5
@@ -53,6 +53,7 @@ spec:
         sentinelPort: 26379
         redisPort: 6379
         annotations: {}
+        labels: {}
         loadBalancerIP:
     clusterDomain: k8s.chq.cengn.ca
     networkPolicy:
@@ -102,6 +103,7 @@ spec:
         type: ClusterIP
         port: 6379
         annotations: {}
+        labels: {}
         loadBalancerIP:
       persistence:
         enabled: true
@@ -118,6 +120,7 @@ spec:
         type: ClusterIP
         port: 6379
         annotations: {}
+        labels: {}
         loadBalancerIP:
       port: 6379
       command: "/run.sh"
@@ -159,11 +162,8 @@ spec:
       image:
         registry: docker.io
         repository: bitnami/redis-exporter
-        tag: 1.1.0-debian-9-r16
+        tag: 1.3.2-debian-9-r0
         pullPolicy: IfNotPresent
-      service:
-        type: ClusterIP
-        annotations: {}
       podAnnotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9121"
@@ -171,6 +171,10 @@ spec:
         enabled: false
         selector:
           prometheus: kube-prometheus
+      service:
+        type: ClusterIP
+        annotations: {}
+        labels: {}
     volumePermissions:
       enabled: false
       image:
@@ -193,3 +197,5 @@ spec:
       pullPolicy: Always
       mountHostSys: false
       resources: {}
+    podSecurityPolicy:
+      create: false
