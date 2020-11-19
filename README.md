@@ -93,12 +93,6 @@ patchUpdated:
 
 In the dev-cluster repo, change the git URL to point to your fork:
 
-```bash
-vim ./install/flux-patch.yaml
-
---git-url=git@github.com:org/dev-cluster
-```
-
 Install the cluster wide Flux with kubectl kustomize:
 
 ```bash
