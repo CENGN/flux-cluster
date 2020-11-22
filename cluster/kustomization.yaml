@@ -3,3 +3,4 @@ bases:
   - ./helm-operator/
   - ./netbox/
   - ./guacamole/
+  - ./atlassian/
