@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: confluence-srv
+  namespace: atlassian
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: confluence
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: confluence
+        track: production
+    spec:
+      nodeSelector:
+        workerClass: infra
+      containers:
+      - name: confluence-srv
+        image: atlassian/confluence-server:7.6.1-jdk11
+        env:
+        # JVM configurations (setenv.sh)
+        - name: JVM_MINIMUM_MEMORY
+          value: 1024m
+        - name: JVM_MAXIMUM_MEMORY
+          value: 8192m
+        - name: JVM_SUPPORT_RECOMMENDED_ARGS
+          value: "-Djava.rmi.server.hostname=confluence-service -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9020 -Dcom.sun.management.jmxremote.rmi.port=9020 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dconfluence.disable.peopledirectory.all=true -Dhttp.socket.timeout=60000 -Datlassian.http.connection.timeout=60000 -Duser.timezone=America/Toronto"
+        # Database
+        - name: ATL_JDBC_URL
+          value: jdbc:mysql://atlassian-db/prod_confluence?useUnicode=true&amp;useSSL=no&amp;characterEncoding=utf8
+        - name: ATL_JDBC_USER
+          value: confluence
+        - name: ATL_JDBC_PASSWORD
+          value: $1$EclBOo./$nusx1yoxLWHuj0EFVl7GT1
+        - name: ATL_DB_DRIVER
+          value: com.mysql.jdbc.Driver
+        - name: ATL_DB_TYPE
+          value: mysql
+        # Reverse Proxy Settings
+        - name: ATL_PROXY_NAME
+          value: confluence.cengn.ca
+        - name: ATL_PROXY_PORT
+          value: "443"
+        - name: ATL_TOMCAT_SCHEME
+          value: https
+        - name: ATL_TOMCAT_SECURE
+          value: "true"
+        volumeMounts:
+        - name: confluence-var
+          mountPath: /var/atlassian/application-data/confluence
+        - name: jdbc-driver-mysql-5148
+          mountPath: /opt/atlassian/confluence/confluence/WEB-INF/lib/mysql-connector-java-5.1.48.jar
+          subPath: mysql-connector-java-5.1.48.jar
+        - name: forgot-password-redirecttojira
+          mountPath: /opt/atlassian/confluence/confluence/login.vm
+          subPath: login.vm
+        #- name: conf-backup
+        #  mountPath: /var/lib/backups
+
+      volumes:
+        #- name: conf-backup
+        #  nfs:
+        #    path: /mnt/jabbapool1/AtlassianBackup/confluence
+        #    server: d-stor01.infra.kan.cengn.ca
+        - name: confluence-var
+          persistentVolumeClaim:
+            claimName: confluence-var-pvc
+        - name: jdbc-driver-mysql-5148
+          configMap:
+            name: jdbc-driver-mysql-5148
+        - name: forgot-password-redirecttojira
+          configMap:
+            name: forgot-password-redirecttojira

@@ -1,0 +1,34 @@
+apiVersion: snapscheduler.backube/v1
+kind: SnapshotSchedule
+metadata:
+  name: jira-snap
+  namespace: atlassian
+spec:
+  # A LabelSelector to control which PVCs should be snapshotted
+  claimSelector: # optional
+    matchLabels:
+      name: jira-var-pvc
+# Set to true to make the schedule inactive
+  disabled: false  # optional
+  retention:
+    # The length of time a given snapshot should be
+    # retained, specified in hours. (168h = 1 week)
+    #expires: # optional
+    # The maximum number of snapshots per PVC to keep
+    maxCount: 20  # optional
+  # The cronspec (https://en.wikipedia.org/wiki/Cron#Overview)
+  # that defines the schedule. It is interpreted with
+  # respect to the UTC timezone. The following pre-defined
+  # shortcuts are also supported: @hourly, @daily, @weekly,
+  # @monthly, and @yearly
+  # schedule: "0 * * * *"
+  schedule: "0 2 * * *"
+  snapshotTemplate:
+    # A set of labels can be added to each
+    # VolumeSnapshot object
+    #labels:  # optional
+    #  apps:
+    # The SnapshotClassName to use when creating the
+    # snapshots. If omitted, the cluster default will
+    # be used.
+    snapshotClassName: csi-rbdplugin-snapclass  # optional

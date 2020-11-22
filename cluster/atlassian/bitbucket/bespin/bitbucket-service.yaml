@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bitbucket-service
+  namespace: atlassian
+  labels:
+    app: bitbucket
+spec:
+  ports:
+  - name: http
+    port: 7990
+    protocol: TCP
+    targetPort: 7990
+  - name: jmx
+    port: 9030
+    protocol: TCP
+    targetPort: 9030
+  - name: ssh
+    port: 7999
+    protocol: TCP
+    targetPort: 7999
+  selector:
+    app: bitbucket

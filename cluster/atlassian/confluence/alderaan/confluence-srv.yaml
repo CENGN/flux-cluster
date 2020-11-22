@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: confluence-srv
+  namespace: atlassian
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: confluence
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: confluence
+        track: staging
+    spec:
+      containers:
+      - name: confluence-srv
+        image: atlassian/confluence-server:7.3.3-jdk11
+        env:
+        # Memory / Heap Size
+        - name: JVM_MINIMUM_MEMORY
+          value: 1024m
+        - name: JVM_MAXIMUM_MEMORY
+          value: 8192m
+        # Database
+        #- name: ATL_JDBC_URL
+        #  value: jdbc:mysql://atlassian-db/staging_confluence?useUnicode=true&amp;amp;characterEncoding=UTF8&amp;amp;sessionVariables=default_storage_engine=InnoDB
+        #- name: ATL_JDBC_USER
+        #  value: confluence
+        #- name: ATL_JDBC_PASSWORD
+        #  value: 4tlass14n!
+        #- name: ATL_DB_DRIVER
+        #  value: com.mysql.jdbc.Driver
+        #- name: ATL_DB_TYPE
+        #  value: mysql
+        # Reverse Proxy Settings
+        - name: ATL_PROXY_NAME
+          value: confluence.k8s-demo.cengn.ca
+        - name: ATL_PROXY_PORT
+          value: "443"
+        - name: ATL_TOMCAT_SCHEME
+          value: https
+        - name: ATL_TOMCAT_SECURE
+          value: "true"
+        volumeMounts:
+        - name: confluence-var
+          mountPath: /var/atlassian/application-data/confluence
+        - name: jdbc-driver-mysql-5148
+          mountPath: /opt/atlassian/confluence/confluence/WEB-INF/lib/mysql-connector-java-5.1.48.jar
+          subPath: mysql-connector-java-5.1.48.jar
+
+      volumes:
+        - name: confluence-var
+          persistentVolumeClaim:
+            claimName: confluence-var-pvc
+        - name: jdbc-driver-mysql-5148
+          configMap:
+            name: jdbc-driver-mysql-5148

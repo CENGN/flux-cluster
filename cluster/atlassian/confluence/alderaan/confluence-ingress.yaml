@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: confluence-web
+  namespace: atlassian
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "36000"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "36000"
+spec:
+  rules:
+  - host: confluence.k8s-demo.cengn.ca
+    http:
+      paths:
+      - backend:
+          serviceName: confluence-service
+          servicePort: 8090
+  tls:
+  - hosts:
+    - confluence.k8s-demo.cengn.ca
+    secretName: confluence-tls

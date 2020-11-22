@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlassian-mysql
+  namespace: atlassian
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: atlassian-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: atlassian-db
+        track: staging
+    spec:
+      containers:
+      - name: atlassian-mysql
+        image: mysql:5.7.29
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: 4tlass14n!
+
+        args:
+          - "--lower-case-table-names=2"
+          - "--innodb-lock-wait-timeout=800"
+          - "--transaction-isolation=READ-COMMITTED"
+          - "--default-storage-engine=INNODB"
+          - "--character-set-server=utf8mb4"
+          - "--collation-server=utf8mb4_bin"
+          - "--innodb-default-row-format=DYNAMIC"
+          - "--innodb-large-prefix=ON"
+          - "--innodb-file-format=Barracuda"
+          - "--innodb-log-file-size=2G"
+          #For Confluence setting requirement
+          - "--max_allowed_packet=256M"
+
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: atlassian-mysql-pv
+      restartPolicy: Always
+      volumes:
+      - name: atlassian-mysql-pv
+        persistentVolumeClaim:
+          claimName: atlassian-mysql-pvc

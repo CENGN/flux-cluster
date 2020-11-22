@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bitbucket-srv
+  namespace: atlassian
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bitbucket
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: bitbucket
+        track: production
+    spec:
+      nodeSelector:
+        workerClass: infra
+      containers:
+      - name: bitbucket-srv
+        image: atlassian/bitbucket-server:7.4.0-jdk11
+        env:
+        # JVM configurations (bitbucket.properties) We are using default min/max memory, no need to set it
+        #- name: JVM_MINIMUM_MEMORY
+        #  value: 512m
+        #- name: JVM_MAXIMUM_MEMORY
+        #  value: 1024m
+        - name: JVM_SUPPORT_RECOMMENDED_ARGS
+          value: "-Djava.rmi.server.hostname=bitbucket-service -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9030 -Dcom.sun.management.jmxremote.rmi.port=9030 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dconfluence.disable.peopledirectory.all=true -Dhttp.socket.timeout=60000 -Datlassian.http.connection.timeout=60000 -Duser.timezone=America/Toronto"
+        # Database
+        - name: JDBC_URL
+          value: jdbc:mysql://atlassian-db/prod_bitbucket?useUnicode=true&amp;amp;characterEncoding=UTF8&amp;amp;sessionVariables=default_storage_engine=InnoDB
+        - name: JDBC_USER
+          value: bitbucket
+        - name: JDBC_PASSWORD
+          value: XhsIsv344yR8nD0ml
+        - name: JDBC_DRIVER
+          value: com.mysql.jdbc.Driver
+        # Reverse Proxy Settings
+        # Adding feature.public.access to false
+        - name: FEATURE_PUBLIC_ACCESS
+          value: "false"
+        - name: SERVER_PROXY_NAME
+          value: bitbucket.cengn.ca
+        - name: SERVER_PROXY_PORT
+          value: "443"
+        - name: SERVER_SCHEME
+          value: https
+        - name: SERVER_SECURE
+          value: "true"
+        volumeMounts:
+        - name: bitbucket-var
+          mountPath: /var/atlassian/application-data/bitbucket
+        #jdbc-driver-mysql configMap mounting is not needed. mysql driver will be stored in bitbucket-var
+        #- name: conf-backup
+        #  mountPath: /var/lib/backups
+
+      volumes:
+        #- name: conf-backup
+        #  nfs:
+        #    path: /mnt/jabbapool1/AtlassianBackup/bitbucket
+        #    server: d-stor01.infra.kan.cengn.ca
+        - name: bitbucket-var
+          persistentVolumeClaim:
+            claimName: bitbucket-var-pvc

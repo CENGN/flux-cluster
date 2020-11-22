@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: confluence-var-pvc
+  namespace: atlassian
+  labels:
+    name: confluence-var-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1.5Ti
+  storageClassName: rook-ceph-block-hdd
