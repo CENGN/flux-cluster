@@ -1,5 +1,4 @@
 bases:
   - ./common/
   - ./helm-operator/
-  - ./netbox/
-  - ./guacamole/
+  - ./atlassian/

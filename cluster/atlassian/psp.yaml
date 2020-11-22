@@ -1,7 +1,7 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: default-psp-netbox-flux
+  name: default-psp-atlassian-flux
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
 spec:
@@ -30,22 +30,22 @@ spec:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: default-psp-netbox-flux
+  name: default-psp-atlassian-flux
 rules:
   - apiGroups: ['policy']
     resources: ['podsecuritypolicies']
     verbs:     ['use']
     resourceNames:
-      - default-psp-netbox-flux
+      - default-psp-atlassian-flux
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: default-psp-netbox-flux
+  name: default-psp-atlassian-flux
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: default-psp-netbox-flux
+  name: default-psp-atlassian-flux
 subjects:
   - kind: ServiceAccount
     name: default
