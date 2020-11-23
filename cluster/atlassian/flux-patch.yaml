@@ -14,7 +14,7 @@ spec:
         - --git-poll-interval=5m
         - --sync-interval=5m
         - --ssh-keygen-dir=/var/fluxd/keygen
-        - --k8s-allow-namespace=netbox-flux
+        - --k8s-allow-namespace=atlassian-flux
         - --git-url=ssh://git@bitbucket.cengn.ca:7999/k8s/atlassian-flux.git
         - --git-branch=master
         volumeMounts:
